@@ -4,20 +4,23 @@ import redis
 r = redis.Redis(host="127.0.0.1",port=6379,db=1)
 
 def write_result():
-    while r.llen('tq3'):
-        mac = r.brpop('tq3',0)[1]
-        try:
-            result = r.get(mac)
-            ip = eval(result)['wanIp']
-            if is_inner_ip(ip):
-                with open('inner_ip.txt','a') as f:
-                    f.write(mac + "\t" + ip + "\n")
-            else:
-                with open('outer_ip.txt','a') as f:
-                    f.write(mac + "\t" + ip + "\n")
-        except:
-            with open('no_ip.txt','a') as f:
-                f.write(mac + "\n")
+    while r.llen('tq'):
+        mac = r.brpop('tq',0)[1]
+        if r.exists(mac):
+            try:
+                result = r.get(mac)
+                ip = eval(result)['wanIp']
+                if is_inner_ip(ip):
+                    with open('inner_ip.txt','a') as f:
+                        f.write(mac + "\t" + ip + "\n")
+                else:
+                    with open('outer_ip.txt','a') as f:
+                        f.write(mac + "\t" + ip + "\n")
+            except:
+                with open('no_ip.txt','a') as f:
+                    f.write(mac + "\n")
+        else:
+            print mac
 def is_inner_ip(ip_addr):
     is_inner = False
     ipNum = get_ip_num(ip_addr)

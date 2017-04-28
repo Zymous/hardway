@@ -11,8 +11,8 @@ r = redis.Redis(host="127.0.0.1",port=6379,db=1)
 
 def url_craw():
     while r.llen('tq2'):
+        mac = r.brpop('tq2',0)[1]
         try:
-            mac = r.brpop('tq2',0)[1]
             if r.exists(mac):
                 continue
             url = 'http://222.73.156.130:8100/router-firmware-update/router/wanIp?mac=%s' % mac
